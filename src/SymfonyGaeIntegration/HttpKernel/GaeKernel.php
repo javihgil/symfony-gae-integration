@@ -72,11 +72,14 @@ abstract class GaeKernel extends Kernel
             case 'gcs':
                 return $this->getGcsCachePath();
 
+            case 'memcached':
+                return $this->getMemcachedCachePath();
+
             case 'file':
                 return $this->getFileCachePath();
 
             default:
-                throw new \Exception(sprintf('"%s" is not a valid GAE cache type. Valid options: gcs, file', $cacheType));
+                throw new \Exception(sprintf('"%s" is not a valid GAE cache type. Valid options: gcs, memcached, file', $cacheType));
         }
     }
 
@@ -165,5 +168,38 @@ abstract class GaeKernel extends Kernel
         }
 
         return $this->getRootDir().'/../var/cache/'.$this->getEnvironment();
+    }
+
+    /**
+     * @return string
+     * @throws \Exception
+     */
+    private function getMemcachedCachePath()
+    {
+        $this->registerMemcachedStreamWrapper();
+
+        $versionSuffix = gae_get_version_suffix();
+
+        return sprintf('memcached://symfony/%s/cache', $versionSuffix ? $versionSuffix : 'dev');
+    }
+
+    /**
+     * Loads memcached stream wrapper
+     *
+     * @throws \Exception
+     */
+    private function registerMemcachedStreamWrapper()
+    {
+        if (!function_exists('getmyuid')) {
+            throw new \Exception('You must activate getmyuid to allow using MemcacheStreamWrapper. You can do this including function name in google_app_engine.enable_functions directive.');
+        }
+
+        if (!class_exists('Memcached')) {
+            throw new \Exception('Memcached extension is not enabled.');
+        }
+
+        if (!in_array('memcached', stream_get_wrappers())) {
+            stream_wrapper_register('memcached', 'Jhg\SymfonyGaeIntegration\StreamWrapper\MemcacheStreamWrapper');
+        }
     }
 }

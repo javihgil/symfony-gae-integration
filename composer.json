@@ -9,7 +9,7 @@
         "psr-4": {
             "Jhg\\SymfonyGaeIntegration\\": "src/SymfonyGaeIntegration/"
         },
-        "files": ["src/gae.php"]
+        "files": ["src/gae.php","src/memcache_stream_wrapper.php"]
     },
     "require-dev": {
         "symfony/config": "~2.7|~3.0",
