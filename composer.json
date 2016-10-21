@@ -1,0 +1,24 @@
+{
+    "name": "javihgil/symfony-gae-integration",
+    "description": "Some utils to deploy Symfony projects on Google App Engine",
+    "type": "library",
+    "license": "MIT",
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "autoload": {
+        "psr-4": {
+            "Jhg\\SymfonyGaeIntegration\\": "src/SymfonyGaeIntegration/"
+        },
+        "files": ["src/gae.php"]
+    },
+    "require-dev": {
+        "symfony/config": "~2.7|~3.0",
+        "symfony/http-kernel": "~2.7|~3.0",
+        "symfony/http-foundation": "~2.7|~3.0"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev"
+        }
+    }
+}

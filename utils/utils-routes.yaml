@@ -1,0 +1,16 @@
+handlers:
+- url: /_sf/phpinfo
+  script: vendor/javihgil/symfony-gae-integration/scripts/phpinfo.php
+  login: admin
+
+  - url: /_sf/config
+  script: web/config.php
+  login: admin
+
+  - url: /_sf/cache-clear
+  script: vendor/javihgil/symfony-gae-integration/scripts/cache-clear.php
+  login: admin
+
+  - url: /_sf/cache-warmup
+  script: vendor/javihgil/symfony-gae-integration/scripts/cache-warmup.php
+  login: admin
