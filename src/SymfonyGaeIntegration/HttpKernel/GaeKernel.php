@@ -2,8 +2,10 @@
 
 namespace Jhg\SymfonyGaeIntegration\HttpKernel;
 
+use Jhg\SymfonyGaeIntegration\DependencyInjection\CompilerPass\OverrideCacheWarmerCompilerPass;
 use Symfony\Component\ClassLoader\ClassCollectionLoader;
 use Symfony\Component\Config\Loader\LoaderInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpFoundation\ServerBag;
 use Symfony\Component\HttpKernel\Kernel;
 
@@ -126,7 +128,7 @@ abstract class GaeKernel extends Kernel
      */
     public function setClassCache(array $classes)
     {
-        if (!$this->server->get('SF_CLASS_CACHE_TO_COMPILED_DIR', false)) {
+        if ($this->isDebug()) {
             parent::setClassCache($classes);
 
             return;
@@ -153,7 +155,7 @@ abstract class GaeKernel extends Kernel
      */
     protected function doLoadClassCache($name, $extension)
     {
-        if (!$this->server->get('SF_CLASS_CACHE_TO_COMPILED_DIR', false)) {
+        if ($this->isDebug()) {
             parent::doLoadClassCache($name, $extension);
 
             return;
@@ -175,6 +177,18 @@ abstract class GaeKernel extends Kernel
         $kernelParameters['kernel.compiled_dir'] = realpath($this->getCompiledDir()) ?: $this->getCompiledDir();
 
         return $kernelParameters;
+    }
+
+    /**
+     * @return ContainerBuilder
+     */
+    protected function buildContainer()
+    {
+        $container = parent::buildContainer();
+
+        $container->addCompilerPass(new OverrideCacheWarmerCompilerPass($this));
+
+        return $container;
     }
 
     /**
