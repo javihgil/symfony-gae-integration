@@ -1,0 +1,18 @@
+skip_files:
+  - ^bin
+  - ^var\/cache
+  - ^var\/logs
+  - ^vendor\/(.*/)?.git/
+  - ^vendor\/(.*/)?.gitignore
+  - ^vendor\/(.*/)?Tests
+  - ^vendor\/(.*/)?tests
+  - ^vendor\/(.*/)?README
+  - ^vendor\/(.*/)?README.md
+  - ^vendor\/(.*/)?CHANGELOG.md
+  - ^vendor\/(.*/)?composer.json
+  - ^vendor\/(.*/)?LICENSE
+  - ^vendor\/(.*/)?phpunit.xml*
+  - ^composer.json
+  - ^composer.lock
+  - ^LICENSE
+  - ^README.md
