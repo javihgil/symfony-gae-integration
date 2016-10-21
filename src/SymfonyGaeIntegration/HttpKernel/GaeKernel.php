@@ -2,6 +2,7 @@
 
 namespace Jhg\SymfonyGaeIntegration\HttpKernel;
 
+use Symfony\Component\ClassLoader\ClassCollectionLoader;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\HttpFoundation\ServerBag;
 use Symfony\Component\HttpKernel\Kernel;
@@ -95,10 +96,20 @@ abstract class GaeKernel extends Kernel
     }
 
     /**
+     * @return string
+     */
+    public function getCompiledDir()
+    {
+        return $this->getRootDir().'/../var/compiled';
+    }
+
+    /**
      * @param LoaderInterface $loader
      */
     public function registerContainerConfiguration(LoaderInterface $loader)
     {
+        $this->checkConstructed();
+
         if (gae_on_app_engine()) {
             $loader->load($this->getRootDir().'/../app/config/config_'.$this->getEnvironment().'_gae.yml');
         } elseif ($this->console) {
@@ -106,6 +117,22 @@ abstract class GaeKernel extends Kernel
         } else {
             $loader->load($this->getRootDir().'/../app/config/config_'.$this->getEnvironment().'.yml');
         }
+    }
+
+    /**
+     * Used internally
+     *
+     * @param array $classes
+     */
+    public function setClassCache(array $classes)
+    {
+        if (!$this->server->get('SF_CLASS_CACHE_TO_COMPILED_DIR', false)) {
+            parent::setClassCache($classes);
+
+            return;
+        }
+
+        file_put_contents($this->getCompiledDir().'/classes.map', sprintf('<?php return %s;', var_export($classes, true)));
     }
 
     /**
@@ -119,13 +146,44 @@ abstract class GaeKernel extends Kernel
         return $this->server->get($key, $default);
     }
 
+
+    /**
+     * @param string $name
+     * @param string $extension
+     */
+    protected function doLoadClassCache($name, $extension)
+    {
+        if (!$this->server->get('SF_CLASS_CACHE_TO_COMPILED_DIR', false)) {
+            parent::doLoadClassCache($name, $extension);
+
+            return;
+        }
+
+        if (!$this->booted && is_file($this->getCompiledDir().'/classes.map')) {
+            ClassCollectionLoader::load(include($this->getCompiledDir().'/classes.map'), $this->getCompiledDir(), $name, $this->debug, false, $extension);
+        }
+    }
+
+    /**
+     * Returns the kernel parameters.
+     *
+     * @return array An array of kernel parameters
+     */
+    protected function getKernelParameters()
+    {
+        $kernelParameters = parent::getKernelParameters();
+        $kernelParameters['kernel.compiled_dir'] = realpath($this->getCompiledDir()) ?: $this->getCompiledDir();
+
+        return $kernelParameters;
+    }
+
     /**
      * Check if constructor was called
      */
     private function checkConstructed()
     {
         if (!$this->constructed) {
-            throw new \Exception('Your AppKernel extends from GaeKernel, so must call parent::__construct()');
+            throw new \Exception('Your AppKernel extends from GaeKernel, so you must call parent::__construct()');
         }
     }
 
