@@ -3,14 +3,14 @@ handlers:
   script: vendor/javihgil/symfony-gae-integration/scripts/phpinfo.php
   login: admin
 
-  - url: /_sf/config
+- url: /_sf/config
   script: web/config.php
   login: admin
 
-  - url: /_sf/cache-clear
+- url: /_sf/cache-clear
   script: vendor/javihgil/symfony-gae-integration/scripts/cache-clear.php
   login: admin
 
-  - url: /_sf/cache-warmup
+- url: /_sf/cache-warmup
   script: vendor/javihgil/symfony-gae-integration/scripts/cache-warmup.php
   login: admin
